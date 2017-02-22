@@ -2605,7 +2605,7 @@ function guicardonclick() {
             return;
         }
         if (stackunit.location === 'MONSTERZONE') {
-            $('.m-monster, .m-field').css({
+            $('.m-monster, .m-field').not('.non-link').css({
                 'display': 'block'
             });
             if ($("#phaseindicator").attr('data-currentphase') === '3') {
