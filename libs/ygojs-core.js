@@ -203,8 +203,7 @@ function init(callback) {
                 0: 8000,
                 1: 8000
             },
-            duelistChat: [],
-            spectatorChat: []
+            chat: []
         },
         decks = {
             0: {
@@ -503,7 +502,7 @@ function init(callback) {
             //stack[pointer].id = cards[i].Code;
         }
         if (username) {
-            state.duelistChat.push('<pre>' + username + ' drew a card.</pre>');
+            state.chat.push('<pre>' + username + ' drew a card.</pre>');
         }
         callback(generateView(), stack);
     }
@@ -680,9 +679,9 @@ function init(callback) {
      */
     function viewGrave(player, username, requester) {
         if (player === requester) {
-            state.duelistChat.push('<pre>' + username + ' is viewing their gaveyard.</pre>');
+            state.chat.push('<pre>' + username + ' is viewing their gaveyard.</pre>');
         } else {
-            state.duelistChat.push('<pre>' + username + ' is viewing your gaveyard.</pre>');
+            state.chat.push('<pre>' + username + ' is viewing your gaveyard.</pre>');
         }
         var deck = filterlocation(filterPlayer(stack, player), 'GRAVE').sort(sortByIndex).reverse(),
             result = {
@@ -708,9 +707,9 @@ function init(callback) {
      */
     function viewBanished(requester, username, player) {
         if (player === requester) {
-            state.duelistChat.push('<pre>' + username + ' is viewing their banished pile.</pre>');
+            state.chat.push('<pre>' + username + ' is viewing their banished pile.</pre>');
         } else {
-            state.duelistChat.push('<pre>' + username + ' is viewing your banished pile.</pre>');
+            state.chat.push('<pre>' + username + ' is viewing your banished pile.</pre>');
         }
         var deck = filterlocation(filterPlayer(stack, player), 'REMOVED').reverse(), // its face up so its reversed.
             result = {
@@ -740,7 +739,7 @@ function init(callback) {
                 1: {},
                 sepectators: {}
             };
-        state.duelistChat.push('<pre>' + username + ' is viewing their deck.</pre>');
+        state.chat.push('<pre>' + username + ' is viewing their deck.</pre>');
         result[player] = {
             action: 'reveal',
             info: state,
@@ -760,7 +759,7 @@ function init(callback) {
                 1: {},
                 sepectators: {}
             };
-        state.duelistChat.push('<pre>' + username + ' is viewing their extra deck..</pre>');
+        state.chat.push('<pre>' + username + ' is viewing their extra deck..</pre>');
 
         result[player] = {
             action: 'reveal',
@@ -787,7 +786,7 @@ function init(callback) {
                 1: {},
                 sepectators: {}
             };
-        state.duelistChat.push('<pre>' + username + ' is viewing their excavated pile..</pre>');
+        state.chat.push('<pre>' + username + ' is viewing their excavated pile..</pre>');
 
         result[player] = {
             action: 'reveal',
@@ -928,15 +927,15 @@ function init(callback) {
             stack.push(makeCard('EXTRA', 1, index, stack.length, card));
         });
         if (manual) {
-            state.duelistChat.push('<pre>Commands:</pre>');
-            state.duelistChat.push('<pre>Draw Cards:  /draw [amount]</pre>');
-            state.duelistChat.push('<pre>Mill Cards:  /mill [amount]</pre>');
-            state.duelistChat.push('<pre>Reduce LP:   /sub [amount]</pre>');
-            state.duelistChat.push('<pre>Increase LP: /add [amount]</pre>');
-            state.duelistChat.push('<pre>Flip Coin:   /flip</pre>');
-            state.duelistChat.push('<pre>Roll Dice:   /roll</pre>');
-            state.duelistChat.push('<pre>Make Token:  /token</pre>');
-            state.duelistChat.push('<pre>Surrender:   /surrender</pre>');
+            state.chat.push('<pre>Commands:</pre>');
+            state.chat.push('<pre>Draw Cards:  /draw [amount]</pre>');
+            state.chat.push('<pre>Mill Cards:  /mill [amount]</pre>');
+            state.chat.push('<pre>Reduce LP:   /sub [amount]</pre>');
+            state.chat.push('<pre>Increase LP: /add [amount]</pre>');
+            state.chat.push('<pre>Flip Coin:   /flip</pre>');
+            state.chat.push('<pre>Roll Dice:   /roll</pre>');
+            state.chat.push('<pre>Make Token:  /token</pre>');
+            state.chat.push('<pre>Surrender:   /surrender</pre>');
         }
         callback(generateView('start'), stack);
     }
@@ -950,7 +949,7 @@ function init(callback) {
      */
     function rematch() {
         stack = [];
-        state.duelistChat.push('<pre>Server: Rematch started</pre>');
+        state.chat.push('<pre>Server: Rematch started</pre>');
         startDuel(round[0][0], round[0][1], true);
     }
 
@@ -987,9 +986,9 @@ function init(callback) {
      */
     function changeLifepoints(player, amount, username) {
         if (amount > 0) {
-            state.duelistChat.push('<pre>' + username + ' gained ' + amount + ' Lifepoints.</pre>');
+            state.chat.push('<pre>' + username + ' gained ' + amount + ' Lifepoints.</pre>');
         } else {
-            state.duelistChat.push('<pre>' + username + ' lost ' + Math.abs(amount) + ' Lifepoints.</pre>');
+            state.chat.push('<pre>' + username + ' lost ' + Math.abs(amount) + ' Lifepoints.</pre>');
         }
         state.lifepoints[player] = state.lifepoints[player] + amount;
         callback(generateView(), stack);
@@ -1000,8 +999,8 @@ function init(callback) {
      * @param {Number} player  player saying the message.
      * @param {String} message message to other spectators
      */
-    function duelistChat(username, message) {
-        state.duelistChat.push(username + ': ' + message);
+    function chat(username, message) {
+        state.chat.push(username + ': ' + message);
         callback(generateView('chat'), stack);
     }
 
@@ -1098,7 +1097,7 @@ function init(callback) {
 
     function rollDie(username) {
         var result = Math.floor(Math.random() * ((6 - 1) + 1) + 1);
-        duelistChat('Server', username + ' rolled a ' + result);
+        chat('Server', username + ' rolled a ' + result);
         return result;
 
     }
@@ -1106,12 +1105,12 @@ function init(callback) {
     function flipCoin(username) {
 
         var result = (Math.random() < 0.5) ? 'Heads' : 'Tails';
-        duelistChat('Server', username + ' flipped ' + result);
+        chat('Server', username + ' flipped ' + result);
         return result;
     }
 
     function surrender(username) {
-        duelistChat('Server', username + ' surrendered.');
+        chat('Server', username + ' surrendered.');
     }
 
     //expose public functions.
@@ -1147,7 +1146,7 @@ function init(callback) {
         revealCallback: revealCallback,
         addCounter: addCounter,
         removeCounter: removeCounter,
-        duelistChat: duelistChat,
+        chat: chat,
         spectatorChat: spectatorChat,
         makeNewCard: makeNewCard,
         removeCard: removeCard,
